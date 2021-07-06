@@ -114,9 +114,9 @@ def hello_name(name):
     response = findBook(dec_msg)
 
     # creating a json object
-    json_obj = response
-
-    return json_obj
+    
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    return response
 
 
 if __name__ == '__main__':
