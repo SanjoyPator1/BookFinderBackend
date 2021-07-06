@@ -1,7 +1,7 @@
 
 from flask import Flask, jsonify
 import json
-from flask_cors import CORS
+from flask_cors import CORS,cross_origin
 
 app = Flask(__name__)  # creating the Flask class object
 CORS(app)
@@ -10,10 +10,20 @@ data = json.loads(open('data.json', encoding="utf8").read())
 
 
 @app.route("/", methods=['GET', 'POST'])
+# @cross_origin()
 def hello():
     return jsonify({"key": "home page value"})
 
 
+# creating a url dynamically
+@app.route('/test/<name>')
+# @cross_origin()
+def hello_test(name):
+
+    # dec_msg is the real question asked by the user
+    response = jsonify({"key": name})
+    
+    return response
 
     
 
@@ -108,6 +118,7 @@ def decrypt(msg):
 
 # creating a url dynamically
 @app.route('/home/<name>')
+# @cross_origin()
 def hello_name(name):
 
     # dec_msg is the real question asked by the user
@@ -117,7 +128,6 @@ def hello_name(name):
 
     # creating a json object
     
-    response.headers.add('Access-Control-Allow-Origin', '*')
     return response
 
 
