@@ -1,5 +1,5 @@
 
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request, render_template
 import json
 from flask_cors import CORS,cross_origin
 
@@ -24,6 +24,52 @@ def hello_test(name):
     response = jsonify({"key": name})
     
     return response
+
+#post - create a new book data
+
+@app.route("/saveItems", methods=['POST'])
+def storeData():
+    if request.method == 'POST':
+        title = request.form['title']
+        author = request.form['author']
+        pdate = request.form['pdate']
+        tags = request.form['tags']
+    else:
+        title = request.args.get('title')
+        author = request.args.get('author')
+        pdate = request.args.get('pdate')
+        tags = request.args.get('tags')
+
+    try:
+        '''Appending Data Items to a json file'''
+        tags = tags.split(",")
+        data = {}
+
+        with open('data.json', 'r') as file:
+            json_data = file.read()
+            json_data = json.loads(json_data)
+
+        #Generating ID
+        nth_books = json_data['books']
+        len_books = len(nth_books)
+        _genID = len_books + 1
+
+        #Reconstructing incoming data to json dict
+        data = {
+            "id": f"{_genID}",
+            "title": f"{title}",
+            "author": f"{author}",
+            "pdate": f"{pdate}",
+            "tags": tags
+        }
+
+        #Appending data to file
+        with open('data.json', 'w') as file:
+            json_data['books'].append(data)
+            json.dump(json_data, file, indent=4)
+        return jsonify({"success": "values stored successfully!"})
+    except:
+        return jsonify({"error": "Some error occured!"})
 
     
 
