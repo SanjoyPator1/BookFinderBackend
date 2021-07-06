@@ -3,20 +3,20 @@ from flask import Flask, jsonify, request, render_template
 import json
 from flask_cors import CORS, cross_origin
 
-app = Flask(__name__)  # creating the Flask class object
-CORS(app)
+application = Flask(__name__)  # creating the Flask class object
+CORS(application)
 
 data = json.loads(open('data.json', encoding="utf8").read())
 
 
-@app.route("/", methods=['GET', 'POST'])
+@application.route("/", methods=['GET', 'POST'])
 # @cross_origin()
 def hello():
     return jsonify({"key": "home page value"})
 
 
 # creating a url dynamically
-@app.route('/test/<name>')
+@application.route('/test/<name>')
 # @cross_origin()
 def hello_test(name):
 
@@ -28,7 +28,7 @@ def hello_test(name):
 # post - create a new book data
 
 
-@app.route("/saveItems", methods=['POST'])
+@application.route("/saveItems", methods=['POST'])
 def storeData():
     if request.method == 'POST':
         title = request.form['title']
@@ -122,7 +122,7 @@ def sendJson(id_list):
 
 # display all
 
-@app.route("/displayall", methods=['GET', 'POST'])
+@application.route("/displayall", methods=['GET', 'POST'])
 def DisplayAll():
     # object list
     list1 = []
@@ -205,7 +205,7 @@ def decrypt(msg):
 
 
 # creating a url dynamically
-@app.route('/home/<name>')
+@application.route('/home/<name>')
 # @cross_origin()
 def hello_name(name):
 
@@ -220,6 +220,6 @@ def hello_name(name):
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    application.run(debug=True)
 
 '''methods=['GET'],['POST']'''

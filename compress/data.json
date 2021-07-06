@@ -25,30 +25,6 @@
                 "jk rowling",
                 "harry potter"
             ]
-        },
-        {
-            "id": "3",
-            "title": "harry potter 3",
-            "author": "jk rowling",
-            "pdate": "1999",
-            "tags": [
-                "harry",
-                "potter",
-                "harry potter 3",
-                "jk rowling"
-            ]
-        },
-        {
-            "id": "4",
-            "title": "harry potter 3",
-            "author": "jk rowling",
-            "pdate": "1999",
-            "tags": [
-                "harry",
-                "potter",
-                "harry potter 3",
-                "jk rowling"
-            ]
         }
     ]
 }
