@@ -1,7 +1,7 @@
 
 from flask import Flask, jsonify, request, render_template
 import json
-from flask_cors import CORS,cross_origin
+from flask_cors import CORS, cross_origin
 
 app = Flask(__name__)  # creating the Flask class object
 CORS(app)
@@ -22,10 +22,11 @@ def hello_test(name):
 
     # dec_msg is the real question asked by the user
     response = jsonify({"key": name})
-    
+
     return response
 
-#post - create a new book data
+# post - create a new book data
+
 
 @app.route("/saveItems", methods=['POST'])
 def storeData():
@@ -49,12 +50,12 @@ def storeData():
             json_data = file.read()
             json_data = json.loads(json_data)
 
-        #Generating ID
+        # Generating ID
         nth_books = json_data['books']
         len_books = len(nth_books)
         _genID = len_books + 1
 
-        #Reconstructing incoming data to json dict
+        # Reconstructing incoming data to json dict
         data = {
             "id": f"{_genID}",
             "title": f"{title}",
@@ -63,7 +64,7 @@ def storeData():
             "tags": tags
         }
 
-        #Appending data to file
+        # Appending data to file
         with open('data.json', 'w') as file:
             json_data['books'].append(data)
             json.dump(json_data, file, indent=4)
@@ -71,10 +72,8 @@ def storeData():
     except:
         return jsonify({"error": "Some error occured!"})
 
-    
 
-
-#book searching - backend
+# book searching - backend
 def sendJson(id_list):
     # object list
     list1 = []
@@ -121,10 +120,53 @@ def sendJson(id_list):
 
     return json_send
 
+# display all
+
+@app.route("/displayall", methods=['GET', 'POST'])
+def DisplayAll():
+    # object list
+    list1 = []
+
+    check_list = []
+    for element in data["books"]:
+
+        print("if condition fulfilled")
+
+        class my_dict(dict):
+            # __init__ function
+            def __init__(self):
+                self = dict()
+        # Function to add key:value
+
+            def add(self, key, value):
+                self[key] = value
+        # Main Function
+        dict_obj = my_dict()
+        #print('id to insert in json response')
+        #print(element['id'])
+        dict_obj.add("id", element["id"])
+        dict_obj.add("title", element["title"])
+        dict_obj.add("author", element["author"])
+        dict_obj.add("pdate", element["pdate"])
+        #print("dictionary : ", dict_obj)
+        list1.append(dict_obj)
+        check_list.append(element["id"])
+        #print("list1 now : ", list1)
+        # break
+
+    # final dictionary
+    final_book_dict = {"books": list1}
+
+    print("final book_dictionary : ", final_book_dict)
+
+    # convert into JSON:
+    json_send = json.dumps(final_book_dict)
+
+    return json_send
+
 
 # # test
-# lis = ["2"]
-# x = sendJson(lis)
+# x = DisplayAll()
 # print("x value: ", x)
 
 
@@ -146,7 +188,7 @@ def findBook(name):
             else:
                 print('not there')
     json_response = sendJson(id_list)
-    
+
     return json_response
 
 
@@ -173,7 +215,7 @@ def hello_name(name):
     response = findBook(dec_msg)
 
     # creating a json object
-    
+
     return response
 
 
