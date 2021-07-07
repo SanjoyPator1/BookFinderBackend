@@ -68,9 +68,9 @@ def storeData():
         with open('data.json', 'w') as file:
             json_data['books'].append(data)
             json.dump(json_data, file, indent=4)
-	return jsonify({"Status":"successfull"})
+        return render_template("success.html")
     except:
-        return jsonify({"error": "Some error occured!"})
+        return render_template("error.html")
 
 
 # book searching - backend
