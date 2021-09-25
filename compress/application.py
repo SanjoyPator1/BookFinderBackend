@@ -68,7 +68,6 @@ def storeData():
         with open('data.json', 'w') as file:
             json_data['books'].append(data)
             json.dump(json_data, file, indent=4)
-        return jsonify({"success": "values stored successfully!"})
     except:
         return jsonify({"error": "Some error occured!"})
 
@@ -126,11 +125,10 @@ def sendJson(id_list):
 def DisplayAll():
     # object list
     list1 = []
+    data1 = json.loads(open('data.json', encoding="utf8").read())
 
     check_list = []
-    for element in data["books"]:
-
-        print("if condition fulfilled")
+    for element in data1["books"]:
 
         class my_dict(dict):
             # __init__ function

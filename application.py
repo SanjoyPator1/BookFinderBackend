@@ -2,6 +2,11 @@
 from flask import Flask, jsonify, request, render_template
 import json
 from flask_cors import CORS, cross_origin
+import pandas as pd
+import json
+import csv
+import pickle
+from flask import Flask
 
 application = Flask(__name__)  # creating the Flask class object
 CORS(application)
@@ -15,208 +20,134 @@ def hello():
     return jsonify({"key": "home page value"})
 
 
-# creating a url dynamically
-@application.route('/test/<name>')
-# @cross_origin()
-def hello_test(name):
-
-    # dec_msg is the real question asked by the user
-    response = jsonify({"key": name})
-
-    return response
-
-# post - create a new book data
+'''RSSI.csv route'''
 
 
-@application.route("/saveItems", methods=['POST'])
-def storeData():
-    if request.method == 'POST':
-        title = request.form['title']
-        author = request.form['author']
-        pdate = request.form['pdate']
-        tags = request.form['tags']
-    else:
-        title = request.args.get('title')
-        author = request.args.get('author')
-        pdate = request.args.get('pdate')
-        tags = request.args.get('tags')
+@application.route("/rssi", methods=['GET', 'POST'])
+# Function to convert a CSV to JSON
+# Takes the file paths as arguments
+def make_json():
 
-    try:
-        '''Appending Data Items to a json file'''
-        tags = tags.split(",")
-        data = {}
+    csvFilePath = r'rssi_test50.csv'
+    jsonFilePath = r'rssi.json'
+    # create a dictionary
+    data = {}
 
-        with open('data.json', 'r') as file:
-            json_data = file.read()
-            json_data = json.loads(json_data)
+    # Open a csv reader called DictReader
+    with open(csvFilePath, encoding='utf-8') as csvf:
+        csvReader = csv.DictReader(csvf)
 
-        # Generating ID
-        nth_books = json_data['books']
-        len_books = len(nth_books)
-        _genID = len_books + 1
+        # Convert each row into a dictionary and add it to data
+        for rows in csvReader:
 
-        # Reconstructing incoming data to json dict
-        data = {
-            "id": f"{_genID}",
-            "title": f"{title}",
-            "author": f"{author}",
-            "pdate": f"{pdate}",
-            "tags": tags
+            # ID as primary key
+            key = rows['sl']
+            data[key] = rows
+
+    # function to dump data
+    with open(jsonFilePath, 'w', encoding='utf-8') as jsonf:
+        jsonf.write(json.dumps(data, indent=4))
+
+    print(data)
+    # creating a json object
+    json_obj = json.dumps(data)
+
+    return json_obj
+
+
+# reading dummy geo data .json
+f = open("dummyGeo.json")
+geoJson = json.load(f)
+
+'''Geo Feature'''
+
+
+@application.route("/geoFeature", methods=['GET', 'POST'])
+# Function to convert a CSV to JSON
+def get_geo():
+    print("geo")
+    # print(geoJson)
+
+    # jsonFormat
+    features = []
+    for gej in geoJson['geo']:
+        # variables
+        daysUntilNow = gej['daysUntilNow']
+        trackId = gej['trackId']
+        AreaNumber = gej['AreaNumber']
+        long = gej['long']
+        lat = gej['lat']
+        segNo = gej['segNo']
+
+        coordinates = []
+        coordinates.append(long)
+        coordinates.append(lat)
+
+        geometry = {
+            "type": "Point",
+            "coordinates": coordinates
         }
 
-        # Appending data to file
-        with open('data.json', 'w') as file:
-            json_data['books'].append(data)
-            json.dump(json_data, file, indent=4)
-        return jsonify({"success": "values stored successfully!"})
-    except:
-        return jsonify({"error": "Some error occured!"})
+        feature = {
+            "type": "Feature",
+            "properties": {
+                "daysUntilNow": daysUntilNow,
+                "trackId": trackId,
+                "AreaNumber": AreaNumber,
+                "long": long,
+                "lat": lat,
+                "segNo": segNo
+            },
+            "geometry": geometry
+        }
+
+        features.append(feature)
+
+    featureCollection = {
+        "type": "FeatureCollection",
+        "features": features
+    }
+    # print(featureCollection)
+    json_obj = json.dumps(featureCollection)
+
+    return json_obj
 
 
-# book searching - backend
-def sendJson(id_list):
-    # object list
-    list1 = []
+# opening Graph json data
+# reading dummy geo data .json
+g = open("dummyTimeRssi.json")
+grJson = json.load(g)
 
-    check_list = []
-    for element in data["books"]:
-        for id in id_list:
-            if id == element["id"] and id not in check_list:
-                print("if condition fulfilled")
-
-                class my_dict(dict):
-                    # __init__ function
-                    def __init__(self):
-                        self = dict()
-                # Function to add key:value
-
-                    def add(self, key, value):
-                        self[key] = value
-                # Main Function
-                dict_obj = my_dict()
-
-                print('id to insert in json response')
-                print(element['id'])
-                dict_obj.add("id", element["id"])
-                dict_obj.add("title", element["title"])
-                dict_obj.add("author", element["author"])
-                dict_obj.add("pdate", element["pdate"])
-
-                print("dictionary : ", dict_obj)
-                list1.append(dict_obj)
-                check_list.append(element["id"])
-                print("list1 now : ", list1)
-                # break
-            else:
-                print('not there')
-
-    # final dictionary
-    final_book_dict = {"books": list1}
-
-    print("final book_dictionary : ", final_book_dict)
-
-    # convert into JSON:
-    json_send = json.dumps(final_book_dict)
-
-    return json_send
-
-# display all
-
-@application.route("/displayall", methods=['GET', 'POST'])
-def DisplayAll():
-    # object list
-    list1 = []
-
-    check_list = []
-    for element in data["books"]:
-
-        print("if condition fulfilled")
-
-        class my_dict(dict):
-            # __init__ function
-            def __init__(self):
-                self = dict()
-        # Function to add key:value
-
-            def add(self, key, value):
-                self[key] = value
-        # Main Function
-        dict_obj = my_dict()
-        #print('id to insert in json response')
-        #print(element['id'])
-        dict_obj.add("id", element["id"])
-        dict_obj.add("title", element["title"])
-        dict_obj.add("author", element["author"])
-        dict_obj.add("pdate", element["pdate"])
-        #print("dictionary : ", dict_obj)
-        list1.append(dict_obj)
-        check_list.append(element["id"])
-        #print("list1 now : ", list1)
-        # break
-
-    # final dictionary
-    final_book_dict = {"books": list1}
-
-    print("final book_dictionary : ", final_book_dict)
-
-    # convert into JSON:
-    json_send = json.dumps(final_book_dict)
-
-    return json_send
+'''Graph - date - rssi'''
 
 
-# # test
-# x = DisplayAll()
-# print("x value: ", x)
+@application.route("/graphRssi", methods=['GET', 'POST'])
+# Function to convert a CSV to JSON
+def get_graph():
+    print("graph")
+    # print(grJson)
 
+    # jsonFormat
+    graphData = []
+    for gej in grJson['graph']:
+        # variables
+        #print("gej", gej)
+        date = gej['date']
+        rssi = gej['rssi']
 
-def findBook(name):
-    string = name
-    name = string.lower()
-    print("lower name: ", name)
+        data = {
+            "date": date,
+            "rssi": rssi
+        }
 
-    id_list = []
+        graphData.append(data)
 
-    for element in data["books"]:
-        for tag in element["tags"]:
-            if tag == name:
-                print('there')
-                print(element['id'])
-                if element['id'] not in id_list:
-                    id_list.append(element['id'])
-                # break
-            else:
-                print('not there')
-    json_response = sendJson(id_list)
+    graphJson = {"graph": graphData}
 
-    return json_response
+    # print(featureCollection)
+    json_obj = json.dumps(graphJson)
 
-
-# function to replace '+' character with ' ' spaces
-def decrypt(msg):
-
-    string = msg
-
-    # converting back '+' character back into ' ' spaces
-    # new_string is the normal message with spaces that was sent by the user
-    new_string = string.replace("+", " ")
-
-    return new_string
-
-
-# creating a url dynamically
-@application.route('/home/<name>')
-# @cross_origin()
-def hello_name(name):
-
-    # dec_msg is the real question asked by the user
-    dec_msg = decrypt(name)
-
-    response = findBook(dec_msg)
-
-    # creating a json object
-
-    return response
+    return json_obj
 
 
 if __name__ == '__main__':

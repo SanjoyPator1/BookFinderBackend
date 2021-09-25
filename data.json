@@ -40,14 +40,14 @@
         },
         {
             "id": "4",
-            "title": "harry potter 3",
-            "author": "jk rowling",
-            "pdate": "1999",
+            "title": "Chatbot - Ava",
+            "author": "sanjoy pator",
+            "pdate": "2020",
             "tags": [
-                "harry",
-                "potter",
-                "harry potter 3",
-                "jk rowling"
+                "sanjoy pator",
+                "sanjoy",
+                "chatbot",
+                "machine learning"
             ]
         }
     ]
