@@ -11,8 +11,6 @@ from flask import Flask
 application = Flask(__name__)  # creating the Flask class object
 CORS(application)
 
-data = json.loads(open('data.json', encoding="utf8").read())
-
 
 @application.route("/", methods=['GET', 'POST'])
 # @cross_origin()
@@ -151,6 +149,6 @@ def get_graph():
 
 
 if __name__ == '__main__':
-    application.run(debug=True)
+    application.run(host="0.0.0.0", debug=True)
 
 '''methods=['GET'],['POST']'''
